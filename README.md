@@ -34,7 +34,64 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o uCVE uCVE.go
 ``` 
     
 ## Use
+### Menu
+```
+> uCVE -h
 
+
+	          .d8888b.  888     888 8888888888 
+	         d88P  Y88b 888     888 888        
+	         888    888 888     888 888        
+	888  888 888        Y88b   d88P 8888888    
+	888  888 888         Y88b d88P  888        
+	888  888 888    888   Y88o88P   888        
+	Y88b 888 Y88b  d88P    Y888P    888        
+	 "Y88888  "Y8888P"      Y8P     8888888888 
+
+	    by M3n0sD0n4ld and Siriil
+			
+
+uCVE parameter:
+
+    -cvss: Filter vulnerabilities by CVSS [all,critical,high,medium,low,none] (default is all)
+    -p: Search CVEs by product software (required)
+    -v: Show version
+    -vp: Set version on product software (required)
+
+Usage:
+    uCVE -p <product> -vp <version_product> [-cvss (all,critical,high,medium,low,none)]
+
+Examples:
+    uCVE -p jquery -vp 1.2.1
+    uCVE -p sunos -vp 5.5.1 -cvss critical,high,medium
+
+```
+
+### CVE's search by default (includes all types of criticality)
+```
+> uCVE -p jquery -vp 1.2.1
+
+
+	          .d8888b.  888     888 8888888888 
+	         d88P  Y88b 888     888 888        
+	         888    888 888     888 888        
+	888  888 888        Y88b   d88P 8888888    
+	888  888 888         Y88b d88P  888        
+	888  888 888    888   Y88o88P   888        
+	Y88b 888 Y88b  d88P    Y888P    888        
+	 "Y88888  "Y8888P"      Y8P     8888888888 
+
+	    by M3n0sD0n4ld and Siriil
+			
+
+[!] This could take a few minutes, please wait...
+
+[+] Results 7 found, then processing
+
+[+] Results saved in 'jquery_1.2.1.html'
+
+```
+    
 ## Credits
 
 ###### Authors: 
