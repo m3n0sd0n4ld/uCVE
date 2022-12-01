@@ -121,6 +121,10 @@ uCVE allows you to sort by CVE identifier, date, vulnerability type, score... Id
 	  
 ![Screenshot](images/table-1.png)
 	  
+In addition, it also incorporates a search engine to filter by type of vulnerability or attack.
+	  
+![Screenshot](images/table-2.png)
+	  
 ## Credits
 
 ###### Authors: 
