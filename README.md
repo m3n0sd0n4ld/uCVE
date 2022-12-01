@@ -9,11 +9,6 @@
     <img src="https://img.shields.io/github/issues/m3n0sd0n4ld/uCVE?style=flat-square">
   <a href="https://github.com/m3n0sd0n4ld/uCVE/commits/master">
     <img src="https://img.shields.io/github/last-commit/m3n0sd0n4ld/uCVE?style=flat-square">
-      <a href="">
-    <img src="https://img.shields.io/twitter/follow/TWITTER-IVÁN?style=flat-square">
-  </a>
-  <a href="">
-    <img src="https://img.shields.io/twitter/follow/David_Uton?style=flat-square">
   </a>
   <h1 align="center">uCVE - Fast CVE Reporting</h1>
   <br>
@@ -21,5 +16,9 @@
 
 ## Credits
 
-###### Authors: M3n0sD0n4ld
-###### Twitter: [@David_Uton](https://twitter.com/David_Uton)
+###### Authors: 
+- [Iván Santos (AKA. Siriil)](https://es.linkedin.com/in/siriil/)
+- [David Utón (AKA. M3n0sd0n4ld)](https://twitter.com/David_Uton)
+    
+## Disclaimer
+texto
