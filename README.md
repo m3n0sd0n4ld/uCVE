@@ -18,7 +18,11 @@
 **uCVE** is a tool written in GO that allows to extract CVE's related to a specific software and version, obtaining a report in HTML format with the result and/or exporting it to the pentesting report.
     
 ## Download and install
-  
+```
+git clone https://github.com/m3n0sd0n4ld/uCVE.git
+```
+    
+    
 ## Use
 
 ## Credits
@@ -27,5 +31,9 @@
 - [Iván Santos (AKA. Siriil)](https://es.linkedin.com/in/siriil/)
 - [David Utón (AKA. M3n0sd0n4ld)](https://twitter.com/David_Uton)
     
-## Disclaimer
-texto
+## Disclaimer and Acknowledgments
+The authors of the tool are not responsible for the misuse of the tool, nor are they responsible for errors in the information obtained and shown in the report.
+
+All information is obtained from the official resource [https://cve.mitre.org](https://cve.mitre.org).
+
+Thanks to **MITRE** and the users who use **uCVE**.
