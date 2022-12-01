@@ -117,6 +117,9 @@ Examples:
 ```
 
 ### Viewing the report
+uCVE allows you to sort by CVE identifier, date, vulnerability type, score... Ideal for reporting in your pentesting reports!
+	  
+![Screenshot](images/table-1.png)
 	  
 ## Credits
 
