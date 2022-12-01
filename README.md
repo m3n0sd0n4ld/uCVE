@@ -15,9 +15,8 @@
 </p>
     
 ## Description
-
-## Help
-
+**uCVE** is a tool written in GO that allows to extract CVE's related to a specific software and version, obtaining a report in HTML format with the result and/or exporting it to the pentesting report.
+    
 ## Download and install
   
 ## Use
