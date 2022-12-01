@@ -23,12 +23,14 @@ git clone https://github.com/m3n0sd0n4ld/uCVE.git
 cd uCVE
 go build uCVE uCVE.go
 ```
-
-### Error: version 'GLIBC_2.32' not found (Any Ubuntu version)
+### Download the compiled binary for Windows, Linux or MacOS
+[Download the latest version](https://github.com/m3n0sd0n4ld/uCVE/releases)
+    
+### Error: version 'GLIBC_2.32' not found (Any Ubuntu version/Debian/Kali/Parrot OS 64bits)
 ```
 git clone https://github.com/m3n0sd0n4ld/uCVE.git
 cd uCVE
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build uCVE uCVE.go
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o uCVE uCVE.go
 ``` 
     
 ## Use
