@@ -115,6 +115,8 @@ Examples:
 [+] Results saved in 'tomcat_8.0.53.html'
 
 ```
+
+### Viewing the report
 	  
 ## Credits
 
