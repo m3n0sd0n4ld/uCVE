@@ -91,7 +91,31 @@ Examples:
 [+] Results saved in 'jquery_1.2.1.html'
 
 ```
-    
+### Search for CVE's by filtering by criticality (separated by commas and without spaces).
+```
+> uCVE -p tomcat -vp 8.0.53 -cvss critical,high
+
+
+	          .d8888b.  888     888 8888888888 
+	         d88P  Y88b 888     888 888        
+	         888    888 888     888 888        
+	888  888 888        Y88b   d88P 8888888    
+	888  888 888         Y88b d88P  888        
+	888  888 888    888   Y88o88P   888        
+	Y88b 888 Y88b  d88P    Y888P    888        
+	 "Y88888  "Y8888P"      Y8P     8888888888 
+
+	    by M3n0sD0n4ld and Siriil
+			
+
+[!] This could take a few minutes, please wait...
+
+[+] Results 2 found, then processing
+
+[+] Results saved in 'tomcat_8.0.53.html'
+
+```
+	  
 ## Credits
 
 ###### Authors: 
