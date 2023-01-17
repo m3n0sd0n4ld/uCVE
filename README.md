@@ -2,7 +2,7 @@
   <img width="460" height="300" src="images/logo.png">
   <br>
   <p align="center">
-  <a href="https://github.com/m3n0sd0n4ld/uCVE/releases/tag/1.0">
+  <a href="https://github.com/m3n0sd0n4ld/uCVE/releases/tag/">
     <img src="https://img.shields.io/github/v/release/m3n0sd0n4ld/uCVE?include_prereleases&style=flat-square">
   </a>
   <a href="https://github.com/m3n0sd0n4ld/uCVE/issues?q=is%3Aissue+is%3Aopen">
