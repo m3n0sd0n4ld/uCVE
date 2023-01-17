@@ -57,14 +57,17 @@ uCVE parameter:
     -p: Search CVEs by product software (required)
     -v: Show version
     -vp: Set version on product software (required)
+    -vr: Set vendor on product software (default is all vendors)
 
 Usage:
-    uCVE -p <product> -vp <version_product> [-cvss (all,critical,high,medium,low,none)]
+    uCVE -p <product> -vp <version_product> [-cvss <all,critical,high,medium,low,none>] [-vr <vendor>]
 
 Examples:
     uCVE -p jquery -vp 1.2.1
+    uCVE -p 'asset manager' -vp 6.6
+    uCVE -p tomcat -vp 8.5.4 -vr apache
+    uCVE -p 'database server' -vp 11.2.0.4 -vr oracle
     uCVE -p sunos -vp 5.5.1 -cvss critical,high,medium
-
 ```
 
 ### CVE's search by default (includes all types of criticality)
