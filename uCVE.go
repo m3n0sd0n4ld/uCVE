@@ -57,16 +57,12 @@ func string_color(color string, main_string string) string {
 	return return_string
 }
 
-func remove_duplicate_str(strSlice [][]string) []string {
-    allKeys := make(map[string]bool)
-    list := []string{}
-    for _, item := range strSlice {
-        if _, value := allKeys[item[0]]; !value {
-            allKeys[item[0]] = true
-            list = append(list, item[0])
-        }
-    }
-    return list
+func select_group_regex_captured (strSlice [][]string, index int) []string{
+	list := []string{}
+	for _, item := range strSlice {
+		list = append(list, item[index])
+	}
+	return list
 }
 
 func append_without_duplicates(a []string, b []string) []string {
@@ -102,9 +98,10 @@ func get_all_cves_search_html(url_base string) ([]string, string) {
 		}
 		responseString := string(responseData)
 
-		r := regexp.MustCompile(`CVE-\d{4}-\d+`)
+		r := regexp.MustCompile(`>(CVE-\d{4}-\d+)<\/a>`)
 		matches := r.FindAllStringSubmatch(responseString, -1)
-		cves_tmp := remove_duplicate_str(matches)
+
+		cves_tmp := select_group_regex_captured(matches, 1)
 		cves = append_without_duplicates(cves, cves_tmp)
 
 		r2 := regexp.MustCompile(`<strong\s+data-testid="vuln-displaying-count-from">(?P<left>\d+)</strong>.*<strong\s+data-testid="vuln-displaying-count-through">(?P<right>\d+)</strong>`)
@@ -118,13 +115,13 @@ func get_all_cves_search_html(url_base string) ([]string, string) {
 	return cves, msg_error
 }
 
-func get_cves_by_product_version(product string, version string, cvss string) ([]string, string) {
+func get_cves_by_product_version(product string, version string, cvss string, vendor string) ([]string, string) {
 	msg_error := ""
 	var cves []string
 	cvss_upper := strings.ToUpper(cvss)
 
-	url_base := "https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&cpe_product=cpe:/:*:"
-	url := url_base + product + ":" + version
+	url_base := "https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&cpe_product=cpe:/:"
+	url := url_base + vendor + ":" + product + ":" + version
 
 	if ((strings.Contains(cvss_upper, "CRITICAL"))&&(strings.Contains(cvss_upper, "HIGH"))&&(strings.Contains(cvss_upper, "MEDIUM"))&&(strings.Contains(cvss_upper, "LOW"))&&(strings.Contains(cvss_upper, "NONE"))) {
 		cvss_upper = "ALL"
@@ -292,10 +289,13 @@ func main() {
 
 		fmt.Println()
 		fmt.Println("Usage:")
-		fmt.Println("    "+SCRIPT_NAME+" -p <product> -vp <version_product> [-cvss (all,critical,high,medium,low,none)]")
+		fmt.Println("    "+SCRIPT_NAME+" -p <product> -vp <version_product> [-cvss <all,critical,high,medium,low,none>] [-vr <vendor>]")
 		fmt.Println()
 		fmt.Println("Examples:")
 		fmt.Println("    "+SCRIPT_NAME+" -p jquery -vp 1.2.1")
+		fmt.Println("    "+SCRIPT_NAME+" -p 'asset manager' -vp 6.6")
+		fmt.Println("    "+SCRIPT_NAME+" -p tomcat -vp 8.5.4 -vr apache")
+		fmt.Println("    "+SCRIPT_NAME+" -p 'database server' -vp 11.2.0.4 -vr oracle")
 		fmt.Println("    "+SCRIPT_NAME+" -p sunos -vp 5.5.1 -cvss critical,high,medium")
 		fmt.Println()
 	}
@@ -307,6 +307,7 @@ func main() {
 	product_flag := flag.String("p", "", "Search CVEs by product software (required)")
 	version_product_flag := flag.String("vp", "", "Set version on product software (required)")
 	cvss_product_flag := flag.String("cvss", "all", "Filter vulnerabilities by CVSS [all,critical,high,medium,low,none] (default is all)")
+	vendor_flag := flag.String("vr", "*", "Set vendor on product software (default is all vendors)")
 	version_show_flag := flag.Bool("v", false, "Show version")
 	flag.Parse()
 
@@ -336,7 +337,11 @@ func main() {
 	fmt.Println(string_color("yellow", "[!] This could take a few minutes, please wait..."))
 	fmt.Println()
 
-	cves, msg_error := get_cves_by_product_version(*product_flag, *version_product_flag, *cvss_product_flag)
+	*product_flag = strings.Replace(*product_flag, " ", "_", -1)
+	*version_product_flag = strings.Replace(*version_product_flag, " ", "_", -1)
+	*vendor_flag = strings.Replace(*vendor_flag, " ", "_", -1)
+
+	cves, msg_error := get_cves_by_product_version(*product_flag, *version_product_flag, *cvss_product_flag, *vendor_flag)
 	if (msg_error != "") {
 		fmt.Println(string_color("red", "[x] Error: " + msg_error))
 		fmt.Println()
