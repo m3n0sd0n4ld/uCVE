@@ -21,7 +21,7 @@
 ```
 git clone https://github.com/m3n0sd0n4ld/uCVE.git
 cd uCVE
-go build uCVE uCVE.go
+go build -o uCVE uCVE.go
 ```
 ### Download the compiled binary for Windows, Linux or MacOS
 [Download the latest version](https://github.com/m3n0sd0n4ld/uCVE/releases)
