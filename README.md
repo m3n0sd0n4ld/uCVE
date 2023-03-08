@@ -151,6 +151,10 @@ In addition, it also incorporates a search engine to filter by type of vulnerabi
 	  
 ![Screenshot](images/table-2.png)
 	  
+If Spanish language is not specified, by default it will generate the report in English (date format included):
+	  
+![Screenshot](images/table-3.png)
+	  
 ## Credits
 
 ###### Authors: 
