@@ -38,85 +38,108 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o uCVE uCVE.go
 ```
 > uCVE -h
 
+         ___________    ___________
+  ____  ___  ____/_ |  / /__  ____/
+  _  / / /  /    __ | / /__  __/   
+  / /_/ // /___  __ |/ / _  /___   
+  \__,_/ \____/  _____/  /_____/ v.2.0
+  
+          by M3n0sD0n4ld and Siriil
 
-	          .d8888b.  888     888 8888888888 
-	         d88P  Y88b 888     888 888        
-	         888    888 888     888 888        
-	888  888 888        Y88b   d88P 8888888    
-	888  888 888         Y88b d88P  888        
-	888  888 888    888   Y88o88P   888        
-	Y88b 888 Y88b  d88P    Y888P    888        
-	 "Y88888  "Y8888P"      Y8P     8888888888 
-
-	    by M3n0sD0n4ld and Siriil
-			
-
+             
 uCVE parameter:
 
-    -cvss: Filter vulnerabilities by CVSS [all,critical,high,medium,low,none] (default is all)
+    -cvss: Filter vulnerabilities by CVSS [critical,high,medium,low,none] (default is all)
+    -iJSON: List products with version in JSON file ({Soft1:1.2.1, Soft2:2.1.2, Soft3: 3.0})
+    -lg: Set language of information [en,es] (default is English (en))
+    -lvp: Save list updated of vendors and products (file list.lvp aprox 3' processing)
+    -oCSV: Save CVEs list in CSV file
+    -oHTML: Save CVEs list in HTML file
+    -oJSON: Save CVEs list in JSON file
+    -oSTD: Save CVEs list in Std Out
+    -oXML: Save CVEs list in XML file
     -p: Search CVEs by product software (required)
+    -spc: Search product software contains in list.lvp (it is required to save this file in the same executation path script)
+    -spl: Search product software literal match in list.lvp (it is required to save this file in the same executation path script)
     -v: Show version
-    -vp: Set version on product software (required)
-    -vr: Set vendor on product software (default is all vendors)
+    -vp: Set version of product software (required)
+    -vr: Set vendor of product software. if you can set character '*', script will search all vendor by product (required)
 
 Usage:
-    uCVE -p <product> -vp <version_product> [-cvss <all,critical,high,medium,low,none>] [-vr <vendor>]
+    uCVE -vr <vendor> -p <product> -vp <version_product>
+         [-cvss <all,critical,high,medium,low,none>] [-lg <en,es>] [-oSTD]
+         [-oHTML|-oCSV|-oJSON|-oXML <filename>] [-lvp] [-spc|-spl <product>]
 
 Examples:
-    uCVE -p jquery -vp 1.2.1
-    uCVE -p 'asset manager' -vp 6.6
-    uCVE -p tomcat -vp 8.5.4 -vr apache
-    uCVE -p 'database server' -vp 11.2.0.4 -vr oracle
-    uCVE -p sunos -vp 5.5.1 -cvss critical,high,medium
+    uCVE -vr '*' -p jquery_ui -vp 1.12.1
+    uCVE -vr apache -p tomcat -vp 8.5.4 -oSTD
+    uCVE -vr oracle -p "database server" -vp 11.2.0.4
+    uCVE -vr oracle -p sunos -vp 5.5.1 -cvss critical,high,medium -lg es -oHTML report -oCSV report
+    uCVE -lvp
+    uCVE -spc jquery
+    uCVE -spl jquery_ui
 ```
 
 ### CVE's search by default (includes all types of criticality)
 ```
-> uCVE -p jquery -vp 1.2.1
+> uCVE -vr eclipse -p jetty -vp 9.3-z -lg es
 
+         ___________    ___________
+  ____  ___  ____/_ |  / /__  ____/
+  _  / / /  /    __ | / /__  __/   
+  / /_/ // /___  __ |/ / _  /___   
+  \__,_/ \____/  _____/  /_____/ v.2.0
+  
+          by M3n0sD0n4ld and Siriil
 
-	          .d8888b.  888     888 8888888888 
-	         d88P  Y88b 888     888 888        
-	         888    888 888     888 888        
-	888  888 888        Y88b   d88P 8888888    
-	888  888 888         Y88b d88P  888        
-	888  888 888    888   Y88o88P   888        
-	Y88b 888 Y88b  d88P    Y888P    888        
-	 "Y88888  "Y8888P"      Y8P     8888888888 
+             
+[+] Language selected is Spanish (es)
 
-	    by M3n0sD0n4ld and Siriil
-			
+[!] This could take a few minutes, please wait
 
-[!] This could take a few minutes, please wait...
+[+] 6 results found for vendor eclipse product jetty version 9.3-z
 
-[+] Results 7 found, then processing
+    Fabricante  Producto  Version  Cve             Vulnerabilidad                               Fecha de Publicacion  Puntuacion  Riesgo  Acceso   Complejidad  
+    ----------  --------  -------  ---             --------------                               --------------------  ----------  ------  ------   -----------  
+    eclipse     jetty     9.3-z    CVE-2022-2048   Recurso no Controlado                        07/07/2022            7.5         Alta    Red      Baja         
+    eclipse     jetty     9.3-z    CVE-2022-2047   Validacion Incorrecta de Entrada             07/07/2022            2.7         Baja    Red      Baja         
+    eclipse     jetty     9.3-z    CVE-2021-34428  Sesion sin Expiracion                        22/06/2021            3.5         Baja    Físico  Baja         
+    eclipse     jetty     9.3-z    CVE-2021-28169  Otro                                         08/06/2021            5.3         Media   Red      Baja         
+    eclipse     jetty     9.3-z    CVE-2021-28165  Improper Handling of Exceptional Conditions  01/04/2021            7.5         Alta    Red      Baja         
+    eclipse     jetty     9.3-z    CVE-2020-27216  Otro                                         23/10/2020            7.0         Alta    Local    Alta         
 
-[+] Results saved in 'jquery_1.2.1.html'
+[!] Results will be exported to HTML file by default
 
+[+] Results saved in 'report_jetty_9.3-z_eclipse.html'
 ```
 ### Search for CVE's by filtering by criticality (separated by commas and without spaces).
 ```
-> uCVE -p tomcat -vp 8.0.53 -cvss critical,high
+> uCVE -vr eclipse -p jetty -vp 9.3-z -lg es -cvss critical,high
 
+         ___________    ___________
+  ____  ___  ____/_ |  / /__  ____/
+  _  / / /  /    __ | / /__  __/   
+  / /_/ // /___  __ |/ / _  /___   
+  \__,_/ \____/  _____/  /_____/ v.2.0
+  
+          by M3n0sD0n4ld and Siriil
 
-	          .d8888b.  888     888 8888888888 
-	         d88P  Y88b 888     888 888        
-	         888    888 888     888 888        
-	888  888 888        Y88b   d88P 8888888    
-	888  888 888         Y88b d88P  888        
-	888  888 888    888   Y88o88P   888        
-	Y88b 888 Y88b  d88P    Y888P    888        
-	 "Y88888  "Y8888P"      Y8P     8888888888 
+             
+[+] Language selected is Spanish (es)
 
-	    by M3n0sD0n4ld and Siriil
-			
+[!] This could take a few minutes, please wait
 
-[!] This could take a few minutes, please wait...
+[+] 3 results found for vendor eclipse product jetty version 9.3-z
 
-[+] Results 2 found, then processing
+    Fabricante  Producto  Version  Cve             Vulnerabilidad                               Fecha de Publicacion  Puntuacion  Riesgo  Acceso  Complejidad  
+    ----------  --------  -------  ---             --------------                               --------------------  ----------  ------  ------  -----------  
+    eclipse     jetty     9.3-z    CVE-2022-2048   Recurso no Controlado                        07/07/2022            7.5         Alta    Red     Baja         
+    eclipse     jetty     9.3-z    CVE-2021-28165  Improper Handling of Exceptional Conditions  01/04/2021            7.5         Alta    Red     Baja         
+    eclipse     jetty     9.3-z    CVE-2020-27216  Otro                                         23/10/2020            7.0         Alta    Local   Alta         
 
-[+] Results saved in 'tomcat_8.0.53.html'
+[!] Results will be exported to HTML file by default
 
+[+] Results saved in 'report_jetty_9.3-z_eclipse.html'
 ```
 
 ### Viewing the report
