@@ -69,38 +69,28 @@ func get_os() string {
 }
 
 func string_color(color string, main_string string) string {
-	var return_string = main_string
-	if (OS == "linux") {
-		//\033
-		var start_color = "\x1b[0;00m"
-		var end_color = "\x1b[0;00m"
-		switch (color) {
-			case "red":
-				start_color = "\x1b[0;31m"
-			break;
-			case "green":
-				start_color = "\x1b[0;32m"
-			break;
-			case "yellow":
-				start_color = "\x1b[0;33m"
-			break;
-			case "blue":
-				start_color = "\x1b[0;34m"
-			break;
-			case "purple":
-				start_color = "\x1b[0;35m"
-			break;
-			case "cyan":
-				start_color = "\x1b[0;36m"
-			break;
-			default:
-				start_color = "\x1b[0;00m"
-			break;
-		}
-		return_string = start_color + main_string + end_color
-	}
-	return return_string
+    if OS != "linux" {
+        return main_string
+    }
+
+    var color_codes = map[string]string{
+        "red": "\x1b[0;31m",
+        "green": "\x1b[0;32m",
+        "yellow": "\x1b[0;33m",
+        "blue": "\x1b[0;34m",
+        "purple": "\x1b[0;35m",
+        "cyan": "\x1b[0;36m",
+    }
+
+    var end_color = "\x1b[0m"
+    var start_color = color_codes[color]
+    if start_color == "" {
+        start_color = "\x1b[0m"
+    }
+
+    return start_color + main_string + end_color
 }
+
 
 func delete(slice []string, index int) []string {
 	// delete element in []string
@@ -194,196 +184,59 @@ func parse_type_score(score string, language string) string {
 }
 
 func parse_vulnerability(vul string, language string) string {
+	translations := map[string]string{
+		"Out-of-bounds Write": "Escritura fuera de limites",
+		"Cross-site Scripting": "XSS",
+		"SQL Injection": "SQLi",
+		"Improper Input Validation": "Validacion Incorrecta de Entrada",
+		"Out-of-bounds Read": "Lectura Fuera de Limites",
+		"OS Command Injection": "Inyeccion de Comandos en el SO",
+		"Path Traversal": "Path Traversal",
+		"CSRF": "CSRF",
+		"Unrestricted Upload of File": "Subida de Fichero no Controlada",
+		"NULL Pointer Dereference": "Referenciar Puntero NULL",
+		"Deserialization of Untrusted Data": "Deserializacion de Datos no Seguros",
+		"Integer Overflow": "Integer Overflow",
+		"Improper Authentication": "Autenticacion Incorrecta",
+		"Hard-coded Credentials": "Credenciales Codificadas",
+		"Missing Authorization": "Falta de Autorizacion",
+		"Command Injection": "Inyeccion de Comandos",
+		"Bounds of a Memory Buffer": "Buffer Overflow",
+		"Incorrect Default Permissions": "Permisos por Defecto Incorrectos",
+		"SSRF": "SSRF",
+		"Race Condition": "Race Condition",
+		"Uncontrolled Resource Consumption": "Recurso no Controlado",
+		"XML External Entity": "XXE",
+		"Code Injection": "Code Injection",
+		"Prototype Pollution": "Contaminacion de Prototipo",
+		"Injection": "Injection",
+		"Insufficient Session Expiration": "Expiracion de Sesion Insuficiente",
+		"Broken Access Control": "Control de Acceso Roto",
+		"Security Misconfiguration": "Configuracion de Seguridad Incorrecta",
+		"Weak Cryptography": "Criptografia Debil",
+		"Security Through Obscurity": "Seguridad por Obscuridad",
+		"Cross-Site Request Forgery": "CSRF",
+		"Remote Code Execution": "Ejecucion Remota de Codigo",
+		"Information Disclosure": "Fuga de Informacion",
+		"Broken Authentication and Session Management": "Autenticacion y Gestion de Sesiones Rota",
+		"Sensitive Data Exposure": "Exposicion de Datos Sensibles",
+		"Server-Side Request Forgery": "SSRF",
+		"Exposure of Sensitive Information to an Unauthorized Actor": "Exposición de información sensible a un agente no autorizado",
+		"Permissions, Privileges, and Access Controls":"Permisos, privilegios y controles de acceso",
+		"Other": "Otro",
+	}	
+
 	vul = html.UnescapeString(vul)
-	if (strings.Contains(vul, "Out-of-bounds Write")) {
-		if (language == "es") {
-			return "Escritura fuera de limites"
-		} else {
-			return vul
+	for key := range translations {
+		if strings.Contains(key, vul) {
+			if language == "es" {
+				return translations[key]
+			}
+			return key
 		}
-	} else if (strings.Contains(vul, "Cross-site Scripting")) {
-		return "XSS"
-	} else if (strings.Contains(vul, "SQL Injection")) {
-		return "SQLi"
-	} else if (strings.Contains(vul, "Improper Input Validation")) {
-		if (language == "es") {
-			return "Validacion Incorrecta de Entrada"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Out-of-bounds Read")) {
-		if (language == "es") {
-			return "Lectura Fuera de Limites"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "OS Command Injection")) {
-		if (language == "en") {
-			return "OS Command Injection"
-		} else if (language == "es") {
-			return "Inyeccion de Comando en el SO"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Path Traversal")) {
-		return "Path Traversal"
-	} else if (strings.Contains(vul, "CSRF")) {
-		return "CSRF"
-	} else if (strings.Contains(vul, "Unrestricted Upload of File")) {
-		if (language == "en") {
-			return "Unrestricted Upload File"
-		} else if (language == "es") {
-			return "Subida de Fichero no Controlada"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "NULL Pointer Dereference")) {
-		if (language == "es") {
-			return "Referenciar Puntero NULL"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Deserialization of Untrusted Data")) {
-		if (language == "es") {
-			return "Deserializacion de Datos no Seguros"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Integer Overflow")) {
-		return "Integer Overflow"
-	} else if (strings.Contains(vul, "Improper Authentication")) {
-		if (language == "es") {
-			return "Autenticacion Incorrecta"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Hard-coded Credentials")) {
-		if (language == "en") {
-			return "Hard-Coded Credentials"
-		} else if (language == "es") {
-			return "Credenciales Codificadas"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Missing Authorization")) {
-		if (language == "es") {
-			return "Falta de Autorizacion"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Command Injection")) {
-		if (language == "en") {
-			return "Command Injection"
-		} else if (language == "es") {
-			return "Inyeccion de Comandos"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Bounds of a Memory Buffer")) {
-		return "Buffer Overflow"
-	} else if (strings.Contains(vul, "Incorrect Default Permissions")) {
-		if (language == "es") {
-			return "Permisos por Defecto Incorrectos"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "SSRF")) {
-		return "SSRF"
-	} else if (strings.Contains(vul, "Race Condition")) {
-		if (language == "en") {
-			return "Race Condition"
-		} else if (language == "es") {
-			return "Condicion de Carrera"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Uncontrolled Resource Consumption")) {
-		if (language == "es") {
-			return "Recurso no Controlado"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "XML External Entity")) {
-		return "XXE"
-	} else if (strings.Contains(vul, "Code Injection")) {
-		if (language == "en") {
-			return "Code Injection"
-		} else if (language == "es") {
-			return "Inyeccion de Codigo"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Prototype Pollution")) {
-		if (language == "en") {
-			return "Prototype Pollution"
-		} else if (language == "es") {
-			return "Contaminacion de Prototipo"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Injection")) {
-		if (language == "en") {
-			return "Injection"
-		} else if (language == "es") {
-			return "Inyeccion"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Open Redirect")) {
-		return "Open Redirect"
-	} else if (strings.Contains(vul, "Insufficient Information")) {
-		if (language == "es") {
-			return "Informacion Insuficiente"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Cleartext Storage of Sensitive Information")) {
-		if (language == "es") {
-			return "Informacion Sensible Almacenada en Texto Claro"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Insufficient Session Expiration")) {
-		if (language == "es") {
-			return "Sesion sin Expiracion"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Generation of Error Message Containing Sensitive Information")) {
-		if (language == "es") {
-			return "Mensaje de Error con Informacion Sensible"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Permissions, Privileges, and Access Controls")) {
-		if (language == "es") {
-			return "Permisos, Privilegios y Accesos de Control"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Allocation of Resources Without Limits or Throttling")) {
-		if (language == "es") {
-			return "Asignacion de Recursos sin Limites"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "Download of Code Without Integrity Check")) {
-		if (language == "es") {
-			return "Descarga de Codigo sin Control de Integridad"
-		} else {
-			return vul
-		}
-	} else if (strings.Contains(vul, "HTTP Request/Response Smuggling")) {
-		return "HTTP Smuggling"
-	} else if (strings.Contains(vul, "Other")) {
-		if (language == "es") {
-			return "Otro"
-		} else {
-			return vul
-		}
-	} else {
-		return vul
 	}
+
+	return vul
 }
 
 func getHtml(url string) string {
