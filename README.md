@@ -18,6 +18,13 @@
 **uCVE** is a tool written in GO that allows to extract CVE's related to a specific software and version, obtaining a report in HTML format with the result and/or exporting it to the pentesting report.
     
 ## Download and install
+
+To install Grepz, run the following command:
+```bash
+go get -v github.com/m3n0sd0n4ld/uCVE
+```
+
+or via building via repository:
 ```
 git clone https://github.com/m3n0sd0n4ld/uCVE.git
 cd uCVE
