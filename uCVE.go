@@ -716,7 +716,6 @@ func get_list_vendors_products() {
 	// Unzip filename_cpe_xml_zip
 	start_spinner()
 	reader, _ := zip.OpenReader(filename_cpe_xml_zip)
-	defer reader.Close()
 	for _, file := range reader.File {
 		in, _ := file.Open()
 		defer in.Close()
