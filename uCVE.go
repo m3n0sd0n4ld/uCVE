@@ -921,7 +921,8 @@ func input_json(file string) []Software {
 // OUTPUT //
 
 func output_html(cves []Cve, filename string, language string) {
-	filename = strings.ToLower(filename)
+	filename = strings.Replace(strings.ToLower(filename), ":", "_", -1)
+	
 	if (!strings.Contains(filename, ".html")) {
 		filename = filename + ".html"
 	}
@@ -1086,7 +1087,8 @@ func output_html(cves []Cve, filename string, language string) {
 }
 
 func output_csv(cves []Cve, filename string, language string) {
-	filename = strings.ToLower(filename)
+	filename = strings.Replace(strings.ToLower(filename), ":", "_", -1)
+
 	if (!strings.Contains(filename, ".csv")) {
 		filename = filename + ".csv"
 	}
@@ -1139,7 +1141,8 @@ func output_csv(cves []Cve, filename string, language string) {
 }
 
 func output_json(cves []Cve, filename string) {
-	filename = strings.ToLower(filename)
+	filename = strings.Replace(strings.ToLower(filename), ":", "_", -1)
+
 	if (!strings.Contains(filename, ".json")) {
 		filename = filename + ".json"
 	}
@@ -1152,7 +1155,8 @@ func output_json(cves []Cve, filename string) {
 }
 
 func output_xml(cves []Cve, filename string) {
-	filename = strings.ToLower(filename)
+	filename = strings.Replace(strings.ToLower(filename), ":", "_", -1)
+
 	if (!strings.Contains(filename, ".xml")) {
 		filename = filename + ".xml"
 	}
