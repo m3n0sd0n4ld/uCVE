@@ -18,11 +18,21 @@
 **uCVE** is a tool written in GO that allows to extract CVE's related to a specific software and version, obtaining a report in HTML format with the result and/or exporting it to the pentesting report.
     
 ## Download and install
+
+To install uCVE, run the following command:
+	  
+```bash
+go get -v github.com/m3n0sd0n4ld/uCVE
 ```
+
+or via building via repository:
+	  
+```bash 
 git clone https://github.com/m3n0sd0n4ld/uCVE.git
 cd uCVE
 go build -o uCVE uCVE.go
-```
+```	  
+	  
 ### Download the compiled binary for Windows, Linux or MacOS
 [Download the latest version](https://github.com/m3n0sd0n4ld/uCVE/releases)
     
