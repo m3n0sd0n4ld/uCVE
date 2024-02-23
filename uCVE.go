@@ -416,7 +416,7 @@ type Cve struct {
 	Complexity string `json:"complexity"`
 }
 
-func get_cves_by_product_version(product string, version string, cvss string, vendor string, language string) ([]Cve, string) {
+func get_cves_by_product_version(product string, version string, cvss string, vendor string, language string, limit int) ([]Cve, string) {
 	msg_error := ""
 	var cves []Cve
 
@@ -426,7 +426,7 @@ func get_cves_by_product_version(product string, version string, cvss string, ve
 	display_matches := 0
 	count_matches := 0
 	index := 0
-	for (display_matches <= count_matches) {
+	for (display_matches <= count_matches) && (count_matches <= limit) {
 		url := url_base + "&startIndex=" + strconv.Itoa(index)
 		responseString := getHtml(url)
 
@@ -497,7 +497,11 @@ func get_cves_by_product_version(product string, version string, cvss string, ve
 		msg_error = ""
 	}
 
-	return cves, msg_error
+	if (len(cves) < limit) {
+		limit = len(cves) 
+	}
+	
+	return cves[0:limit], msg_error
 }
 
 func get_cves_info(cves []Cve, n_cves int, language string) {
@@ -1297,6 +1301,7 @@ func main() {
 		fmt.Println("    " + SCRIPT_NAME + " -vr '*' -p jquery_ui -vp 1.12.1")
 		fmt.Println("    " + SCRIPT_NAME + " -vr apache -p tomcat -vp 8.5.4 -oSTD")
 		fmt.Println("    " + SCRIPT_NAME + " -vr oracle -p \"database server\" -vp 11.2.0.4")
+		fmt.Println("    " + SCRIPT_NAME + " -l 10 -vr oracle -p \"database server\" -vp 11.2.0.4")
 		fmt.Println("    " + SCRIPT_NAME + " -vr oracle -p sunos -vp 5.5.1 -cvss critical,high,medium -lg es -oHTML report -oCSV report")
 		fmt.Println("    " + SCRIPT_NAME + " -lvp")
 		fmt.Println("    " + SCRIPT_NAME + " -spc jquery")
@@ -1313,6 +1318,7 @@ func main() {
 	search_product_contains_flag := flag.String("spc", "", "Search product software contains in list.lvp (it is required to save this file in the same executation path script)")
 	cvss_product_flag := flag.String("cvss", "critical,high,medium,low,none", "Filter vulnerabilities by CVSS [critical,high,medium,low,none] (default is all)")
 	language_flag := flag.String("lg", "*", "Set language of information [en,es] (default is English (en))")
+	limit := flag.Int("l", 10000, "Limit the amount of results so that it doesn't take much time")
 	list_vendor_product_flag := flag.Bool("lvp", false, "Save list updated of vendors and products (file list.lvp aprox 3' processing)")
 	i_json_flag := flag.String("iJSON", "*", "List products with version in JSON file ({Soft1:1.2.1, Soft2:2.1.2, Soft3: 3.0})")
 	o_html_flag := flag.String("oHTML", "*", "Save CVEs list in HTML file")
@@ -1349,7 +1355,7 @@ func main() {
 	error_amount_software := 0 
 	for _, software := range softwares {
 		start_spinner()
-		cves_tmp, msg_error := get_cves_by_product_version(software.Product, software.Version, *cvss_product_flag, software.Vendor, *language_flag)
+		cves_tmp, msg_error := get_cves_by_product_version(software.Product, software.Version, *cvss_product_flag, software.Vendor, *language_flag, *limit)
 		if (msg_error != "") {
 			stop_spinner()
 			fmt.Println("[" + string_color("red", "x") + "] Error: Vendor " + software.Vendor + " Product " + software.Product + " Version " + software.Version + " " + msg_error)
