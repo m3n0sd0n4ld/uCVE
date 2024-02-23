@@ -1187,6 +1187,7 @@ func check_list_vendor_product_flag(list_vendor_product bool) {
 
 func check_search_product_literal_flag(search_product_literal string) {
 	if (search_product_literal != "") {
+		search_product_literal = strings.ToLower(search_product_literal)
 		fmt.Println("[" + string_color("green", "+") + "] " + string_color("green", "Search literal") + " product '" + string_color("green", search_product_literal) + "' in '" + string_color("green", FILENAME_LVP) + "'")
 		fmt.Println()
 		matches := search_products_in_lvp(search_product_literal, "literal")
