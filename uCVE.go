@@ -1202,6 +1202,7 @@ func check_search_product_literal_flag(search_product_literal string) {
 
 func check_search_product_contains_flag(search_product_contains string) {
 	if (search_product_contains != "") {
+		search_product_contains = strings.ToLower(search_product_contains)
 		fmt.Println("[" + string_color("green", "+") + "] " + string_color("green", "Search contains") + " product '" + string_color("green", search_product_contains) + "' in '" + string_color("green", FILENAME_LVP) + "'")
 		fmt.Println()
 		matches := search_products_in_lvp(search_product_contains, "contains")
