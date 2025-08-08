@@ -60,7 +60,7 @@ Parameters:
 
 ### CVE's search by default (includes all types of criticality)
 ```console
-> uCVE -s tomcat -vp 8.5.4 -lg es
+> uCVE -s tomcat -vp 8.5.4
 
          ___________    ___________
   ____  ___  ____/_ |  / /__  ____/
@@ -72,34 +72,35 @@ Parameters:
 
 [+] 346 results for tomcat, version: 8.5.4
 
-┌──────────────────┬──────────────────────┬─────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬─────────┬──────────┬─────────────┐
-│ Fabricante       │ Producto             │ Versión │ CVE            │ Vulnerabilidad                      │ Fecha Publicación │ Puntuación │ Riesgo  │ Acceso   │ Complejidad │
-├──────────────────┼──────────────────────┼─────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼─────────┼──────────┼─────────────┤
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-0672  │ Información insuficiente            │ 20/07/2000        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-0759  │ Otro                                │ 20/10/2000        │ 6.4        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-0760  │ Otro                                │ 20/10/2000        │ 6.4        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-0590  │ Otro                                │ 02/08/2001        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-0917  │ Otro                                │ 22/11/2001        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-0829  │ Otro                                │ 06/12/2001        │ 5.1        │ MEDIO   │ RED      │ ALTA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-1563  │ Otro                                │ 31/12/2001        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-1210  │ Otro                                │ 22/03/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0682  │ Otro                                │ 23/07/2002        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0493  │ Funciones de seguridad              │ 12/08/2002        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0935  │ Otro                                │ 04/10/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0936  │ Otro                                │ 04/10/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-1148  │ Otro                                │ 11/10/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-1895  │ Otro                                │ 31/12/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2006  │ Otro                                │ 31/12/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2007  │ Otro                                │ 31/12/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2008  │ Otro                                │ 31/12/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2009  │ Otro                                │ 31/12/2002        │ 5.0        │ MEDIO   │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2272  │ Restr. en búfer de memoria          │ 31/12/2002        │ 7.8        │ ALTO    │ RED      │ BAJA        │
+┌──────────────────┬──────────────────────┬─────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬──────────┬──────────────┬─────────────┐
+│ Vendor           │ Product              │ Version │ CVE            │ Vulnerability                       │ Published Date    │ Score      │ Risk     │ Access       │ Complexity  │
+├──────────────────┼──────────────────────┼─────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼──────────┼──────────────┼─────────────┤
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-0672  │ Insufficient Information            │ 20/07/2000        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-0759  │ Other                               │ 20/10/2000        │ 6.4        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-0760  │ Other                               │ 20/10/2000        │ 6.4        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-0590  │ Other                               │ 02/08/2001        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-0917  │ Other                               │ 22/11/2001        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-0829  │ Other                               │ 06/12/2001        │ 5.1        │ MEDIUM   │ NETWORK      │ HIGH        │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-1563  │ Other                               │ 31/12/2001        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2000-1210  │ Other                               │ 22/03/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0682  │ Other                               │ 23/07/2002        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0493  │ Security Features                   │ 12/08/2002        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0935  │ Other                               │ 04/10/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0936  │ Other                               │ 04/10/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-1148  │ Other                               │ 11/10/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-1895  │ Other                               │ 31/12/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2006  │ Other                               │ 31/12/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2007  │ Other                               │ 31/12/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2008  │ Other                               │ 31/12/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2009  │ Other                               │ 31/12/2002        │ 5.0        │ MEDIUM   │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2272  │ Improper Mem. Buffer Restr.         │ 31/12/2002        │ 7.8        │ HIGH     │ NETWORK      │ LOW         │
 ...<SNIP>...
 └──────────────────┴──────────────────────┴─────────┴────────────────┴─────────────────────────────────────┴───────────────────┴────────────┴─────────┴──────────┴─────────────┘
 ```
+
 ### Search for CVE's by filtering by criticality (separated by commas and without spaces).
 ```console
-> uCVE -s tomcat -vp 8.5.4 -lg es -r critical,high -oHTML Tomcat-8.5.4.html
+> uCVE -s tomcat -vp 8.5.4 -r critical,high -oHTML Tomcat-8.5.4.html
 
          ___________    ___________
   ____  ___  ____/_ |  / /__  ____/
@@ -111,31 +112,32 @@ Parameters:
 
 [+] 121 results for tomcat, version: 8.5.4
 
-┌──────────────────┬──────────────────────┬─────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬─────────┬──────────┬─────────────┐
-│ Fabricante       │ Producto             │ Versión │ CVE            │ Vulnerabilidad                      │ Fecha Publicación │ Puntuación │ Riesgo  │ Acceso   │ Complejidad │
-├──────────────────┼──────────────────────┼─────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼─────────┼──────────┼─────────────┤
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-1563  │ Otro                                │ 31/12/2001        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0682  │ Otro                                │ 23/07/2002        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0493  │ Funciones de seguridad              │ 12/08/2002        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2272  │ Restr. en búfer de memoria          │ 31/12/2002        │ 7.8        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-1394  │ Otro                                │ 17/01/2003        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2004-1452  │ Otro                                │ 31/12/2004        │ 7.2        │ ALTO    │ LOCAL    │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2005-4836  │ Exposición de datos sensibles       │ 31/12/2005        │ 7.8        │ ALTO    │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2006-4517  │ Errores numéricos                   │ 01/11/2006        │ 7.8        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat Jk Web Ser... │ 8.5.4   │ CVE-2007-0774  │ Otro                                │ 04/03/2007        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2006-7197  │ Otro                                │ 25/04/2007        │ 7.8        │ ALTO    │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2008-0457  │ Validación de entrada incorrecta    │ 07/02/2008        │ 10.0       │ CRÍTICO │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2009-3548  │ Errores en gestión de credenciales  │ 12/11/2009        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2009-3843  │ Control de acceso                   │ 24/11/2009        │ 10.0       │ CRÍTICO │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2009-4188  │ Errores en gestión de credenciales  │ 03/12/2009        │ 10.0       │ CRÍTICO │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2009-4189  │ Errores en gestión de credenciales  │ 03/12/2009        │ 10.0       │ CRÍTICO │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2010-0557  │ Errores en gestión de credenciales  │ 05/02/2010        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2010-0570  │ Errores en gestión de credenciales  │ 05/03/2010        │ 10.0       │ CRÍTICO │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2010-1929  │ Restr. en búfer de memoria          │ 28/06/2010        │ 9.0        │ ALTO    │ RED      │ BAJA        │
-│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2011-3190  │ Control de acceso                   │ 31/08/2011        │ 7.5        │ ALTO    │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2013-1221  │ Otro                                │ 09/05/2013        │ 10.0       │ CRÍTICO │ RED      │ BAJA        │
-│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2013-1222  │ Otro                                │ 09/05/2013        │ 7.8        │ ALTO    │ RED      │ BAJA        │
-| 
+┌──────────────────┬──────────────────────┬─────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬──────────┬──────────────┬─────────────┐
+│ Vendor           │ Product              │ Version │ CVE            │ Vulnerability                       │ Published Date    │ Score      │ Risk     │ Access       │ Complexity  │
+├──────────────────┼──────────────────────┼─────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼──────────┼──────────────┼─────────────┤
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2001-1563  │ Other                               │ 31/12/2001        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0682  │ Other                               │ 23/07/2002        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-0493  │ Security Features                   │ 12/08/2002        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-2272  │ Improper Mem. Buffer Restr.         │ 31/12/2002        │ 7.8        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2002-1394  │ Other                               │ 17/01/2003        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2004-1452  │ Other                               │ 31/12/2004        │ 7.2        │ HIGH     │ LOCAL        │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2005-4836  │ Sensitive Info Exposure             │ 31/12/2005        │ 7.8        │ HIGH     │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2006-4517  │ Numeric Errors                      │ 01/11/2006        │ 7.8        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat Jk Web Ser... │ 8.5.4   │ CVE-2007-0774  │ Other                               │ 04/03/2007        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2006-7197  │ Other                               │ 25/04/2007        │ 7.8        │ HIGH     │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2008-0457  │ Improper Input Validation           │ 07/02/2008        │ 10.0       │ CRITICAL │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2009-3548  │ Credentials Management Errors       │ 12/11/2009        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2009-3843  │ Access Controls                     │ 24/11/2009        │ 10.0       │ CRITICAL │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2009-4188  │ Credentials Management Errors       │ 03/12/2009        │ 10.0       │ CRITICAL │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2009-4189  │ Credentials Management Errors       │ 03/12/2009        │ 10.0       │ CRITICAL │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2010-0557  │ Credentials Management Errors       │ 05/02/2010        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2010-0570  │ Credentials Management Errors       │ 05/03/2010        │ 10.0       │ CRITICAL │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2010-1929  │ Improper Mem. Buffer Restr.         │ 28/06/2010        │ 9.0        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2011-3190  │ Access Controls                     │ 31/08/2011        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2013-1221  │ Other                               │ 09/05/2013        │ 10.0       │ CRITICAL │ NETWORK      │ LOW         │
+│ Tomcat           │ Tomcat               │ 8.5.4   │ CVE-2013-1222  │ Other                               │ 09/05/2013        │ 7.8        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2013-2185  │ Improper Input Validation           │ 19/01/2014        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
+│ Apache           │ Tomcat               │ 8.5.4   │ CVE-2014-0050  │ Access Controls                     │ 01/04/2014        │ 7.5        │ HIGH     │ NETWORK      │ LOW         │
 ...<SNIP>...
 └──────────────────┴──────────────────────┴─────────┴────────────────┴─────────────────────────────────────┴───────────────────┴────────────┴─────────┴──────────┴─────────────┘
 [+] Vulnerabilities table exported to 'Tomcat-8.5.4.html'
