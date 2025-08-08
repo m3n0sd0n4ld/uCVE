@@ -30,7 +30,7 @@ go build -o uCVE uCVE.go
 ## Use
 ### Menu
 ```console
-> uCVE
+> uCVE -h
 
          ___________    ___________
   ____  ___  ____/_ |  / /__  ____/
