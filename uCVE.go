@@ -5,8 +5,9 @@ import (
     "encoding/json"
     "flag"
     "fmt"
-    "html/template"
     "log"
+    "html/template"
+    "io"
     "net/http"
     "net/url"
     "os"
@@ -162,14 +163,26 @@ func compareVersions(v1, v2 string) int {
     v2 = strings.TrimPrefix(v2, "v")
     v1Parts := strings.Split(v1, ".")
     v2Parts := strings.Split(v2, ".")
-    for i := 0; i < len(v1Parts) && i < len(v2Parts); i++ {
-        n1, _ := strconv.Atoi(strings.TrimSpace(v1Parts[i]))
-        n2, _ := strconv.Atoi(strings.TrimSpace(v2Parts[i]))
+    maxLen := len(v1Parts)
+    if len(v2Parts) < maxLen {
+        maxLen = len(v2Parts)
+    }
+    for i := 0; i < maxLen; i++ {
+        n1, err1 := strconv.Atoi(strings.TrimSpace(v1Parts[i]))
+        n2, err2 := strconv.Atoi(strings.TrimSpace(v2Parts[i]))
+        if err1 != nil || err2 != nil {
+            return strings.Compare(v1Parts[i], v2Parts[i])
+        }
         if n1 < n2 {
             return -1
         } else if n1 > n2 {
             return 1
         }
+    }
+    if len(v1Parts) < len(v2Parts) {
+        return -1
+    } else if len(v1Parts) > len(v2Parts) {
+        return 1
     }
     return 0
 }
@@ -208,12 +221,12 @@ func formatDate(d string) string {
     return t.Format("02/01/2006")
 }
 
-func truncateString(s string, max int) string {
-    if utf8.RuneCountInString(s) > max {
-        runes := []rune(s)
-        return string(runes[:max-3]) + "..."
+func truncateString(str string, maxLen int) string {
+    if utf8.RuneCountInString(str) > maxLen {
+        runes := []rune(str)
+        return string(runes[:maxLen-3]) + "..."
     }
-    return s
+    return str
 }
 
 func generateHTMLTable(filename, product, version, lang string, data []vulnDisplay) {
@@ -541,15 +554,15 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
     }
 
     if useColors {
-        sb.WriteString(fmt.Sprintf("[%s+%s] %d results for %s, version: %s\n\n", Green, Reset, len(displayVulns), search, version))
+        sb.WriteString(fmt.Sprintf("[%s+%s] %d resultados para %s, versión: %s\n", Green, Reset, len(displayVulns), search, version))
     } else {
-        sb.WriteString(fmt.Sprintf("[+] %d results for %s, version: %s\n\n", len(displayVulns), search, version))
+        sb.WriteString(fmt.Sprintf("[+] %d resultados para %s, versión: %s\n", len(displayVulns), search, version))
     }
 
     if lang == "es" {
-        sb.WriteString("┌──────────────────┬──────────────────────┬─────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬─────────┬──────────┬─────────────┐\n")
+        sb.WriteString("┌────────────────────────┬──────────────────────────────┬────────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬──────────┬──────────┬─────────────┐\n")
         if useColors {
-            sb.WriteString(fmt.Sprintf("│ %s%s%-16s%s │ %s%s%-20s%s │ %s%s%-7s%s │ %s%s%-14s%s │ %s%s%-35s%s │ %s%s%-17s%s │ %s%s%-10s%s │ %s%s%-7s%s │ %s%s%-8s%s │ %s%s%-11s%s │\n",
+            sb.WriteString(fmt.Sprintf("│ %s%s%-22s%s │ %s%s%-28s%s │ %s%s%-10s%s │ %s%s%-14s%s │ %s%s%-35s%s │ %s%s%-17s%s │ %s%s%-10s%s │ %s%s%-8s%s │ %s%s%-8s%s │ %s%s%-11s%s │\n",
                 BrightWhite, Bold, "Fabricante", Reset,
                 BrightWhite, Bold, "Producto", Reset,
                 BrightWhite, Bold, "Versión", Reset,
@@ -561,15 +574,15 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
                 BrightWhite, Bold, "Acceso", Reset,
                 BrightWhite, Bold, "Complejidad", Reset))
         } else {
-            sb.WriteString(fmt.Sprintf("│ %-16s │ %-20s │ %-7s │ %-14s │ %-35s │ %-17s │ %-10s │ %-7s │ %-8s │ %-11s │\n",
+            sb.WriteString(fmt.Sprintf("│ %-22s │ %-28s │ %-10s │ %-14s │ %-35s │ %-17s │ %-10s │ %-8s │ %-8s │ %-11s │\n",
                 "Fabricante", "Producto", "Versión", "CVE", "Vulnerabilidad",
                 "Fecha Publicación", "Puntuación", "Riesgo", "Acceso", "Complejidad"))
         }
-        sb.WriteString("├──────────────────┼──────────────────────┼─────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼─────────┼──────────┼─────────────┤\n")
+        sb.WriteString("├────────────────────────┼──────────────────────────────┼────────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼──────────┼──────────┼─────────────┤\n")
     } else {
-        sb.WriteString("┌──────────────────┬──────────────────────┬─────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬──────────┬──────────────┬─────────────┐\n")
+        sb.WriteString("┌────────────────────────┬──────────────────────────────┬────────────┬────────────────┬─────────────────────────────────────┬───────────────────┬────────────┬──────────┬──────────────┬─────────────┐\n")
         if useColors {
-            sb.WriteString(fmt.Sprintf("│ %s%s%-16s%s │ %s%s%-20s%s │ %s%s%-7s%s │ %s%s%-14s%s │ %s%s%-35s%s │ %s%s%-17s%s │ %s%s%-10s%s │ %s%s%-8s%s │ %s%s%-12s%s │ %s%s%-11s%s │\n",
+            sb.WriteString(fmt.Sprintf("│ %s%s%-22s%s │ %s%s%-28s%s │ %s%s%-10s%s │ %s%s%-14s%s │ %s%s%-35s%s │ %s%s%-17s%s │ %s%s%-10s%s │ %s%s%-8s%s │ %s%s%-12s%s │ %s%s%-11s%s │\n",
                 BrightWhite, Bold, "Vendor", Reset,
                 BrightWhite, Bold, "Product", Reset,
                 BrightWhite, Bold, "Version", Reset,
@@ -581,16 +594,16 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
                 BrightWhite, Bold, "Access", Reset,
                 BrightWhite, Bold, "Complexity", Reset))
         } else {
-            sb.WriteString(fmt.Sprintf("│ %-16s │ %-20s │ %-7s │ %-14s │ %-35s │ %-17s │ %-10s │ %-8s │ %-12s │ %-11s │\n",
+            sb.WriteString(fmt.Sprintf("│ %-22s │ %-28s │ %-10s │ %-14s │ %-35s │ %-17s │ %-10s │ %-8s │ %-12s │ %-11s │\n",
                 "Vendor", "Product", "Version", "CVE", "Vulnerability",
                 "Published Date", "Score", "Risk", "Access", "Complexity"))
         }
-        sb.WriteString("├──────────────────┼──────────────────────┼─────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼──────────┼──────────────┼─────────────┤\n")
+        sb.WriteString("├────────────────────────┼──────────────────────────────┼────────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼──────────┼──────────────┼─────────────┤\n")
     }
 
     for i, dv := range displayVulns {
-        truncatedVendor := truncateString(dv.Vendor, 16)
-        truncatedProduct := truncateString(dv.Product, 20)
+        truncatedVendor := truncateString(dv.Vendor, 22)
+        truncatedProduct := truncateString(dv.Product, 28)
         truncatedTitle := truncateString(dv.VulnerabilityTitle, 35)
         truncatedCVE := truncateString(dv.CVE, 14)
 
@@ -608,7 +621,7 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
 
         if lang == "es" {
             if useColors {
-                sb.WriteString(fmt.Sprintf("│ %s%-16s%s │ %s%-20s%s │ %s%-7s%s │ %s%-14s%s │ %s%-35s%s │ %s%-17s%s │ %s%-10s%s │ %s%-7s%s │ %s%-8s%s │ %s%-11s%s │\n",
+                sb.WriteString(fmt.Sprintf("│ %s%-22s%s │ %s%-28s%s │ %s%-10s%s │ %s%-14s%s │ %s%-35s%s │ %s%-17s%s │ %s%-10s%s │ %s%-8s%s │ %s%-8s%s │ %s%-11s%s │\n",
                     rowColor, truncatedVendor, Reset,
                     rowColor, truncatedProduct, Reset,
                     rowColor, dv.Version, Reset,
@@ -620,13 +633,13 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
                     rowColor, dv.Access, Reset,
                     rowColor, dv.Complexity, Reset))
             } else {
-                sb.WriteString(fmt.Sprintf("│ %-16s │ %-20s │ %-7s │ %-14s │ %-35s │ %-17s │ %-10s │ %-7s │ %-8s │ %-11s │\n",
+                sb.WriteString(fmt.Sprintf("│ %-22s │ %-28s │ %-10s │ %-14s │ %-35s │ %-17s │ %-10s │ %-8s │ %-8s │ %-11s │\n",
                     truncatedVendor, truncatedProduct, dv.Version, truncatedCVE,
                     truncatedTitle, dv.Published, dv.Score, dv.RiskText, dv.Access, dv.Complexity))
             }
         } else {
             if useColors {
-                sb.WriteString(fmt.Sprintf("│ %s%-16s%s │ %s%-20s%s │ %s%-7s%s │ %s%-14s%s │ %s%-35s%s │ %s%-17s%s │ %s%-10s%s │ %s%-8s%s │ %s%-12s%s │ %s%-11s%s │\n",
+                sb.WriteString(fmt.Sprintf("│ %s%-22s%s │ %s%-28s%s │ %s%-10s%s │ %s%-14s%s │ %s%-35s%s │ %s%-17s%s │ %s%-10s%s │ %s%-8s%s │ %s%-12s%s │ %s%-11s%s │\n",
                     rowColor, truncatedVendor, Reset,
                     rowColor, truncatedProduct, Reset,
                     rowColor, dv.Version, Reset,
@@ -638,7 +651,7 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
                     rowColor, dv.Access, Reset,
                     rowColor, dv.Complexity, Reset))
             } else {
-                sb.WriteString(fmt.Sprintf("│ %-16s │ %-20s │ %-7s │ %-14s │ %-35s │ %-17s │ %-10s │ %-8s │ %-12s │ %-11s │\n",
+                sb.WriteString(fmt.Sprintf("│ %-22s │ %-28s │ %-10s │ %-14s │ %-35s │ %-17s │ %-10s │ %-8s │ %-12s │ %-11s │\n",
                     truncatedVendor, truncatedProduct, dv.Version, truncatedCVE,
                     truncatedTitle, dv.Published, dv.Score, dv.RiskText, dv.Access, dv.Complexity))
             }
@@ -646,9 +659,9 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
     }
 
     if lang == "es" {
-        sb.WriteString("└──────────────────┴──────────────────────┴─────────┴────────────────┴─────────────────────────────────────┴───────────────────┴────────────┴─────────┴──────────┴─────────────┘\n")
+        sb.WriteString("└────────────────────────┴──────────────────────────────┴────────────┴────────────────┴─────────────────────────────────────┴───────────────────┴────────────┴──────────┴──────────┴─────────────┘\n")
     } else {
-        sb.WriteString("└──────────────────┴──────────────────────┴─────────┴────────────────┴─────────────────────────────────────┴───────────────────┴────────────┴──────────┴──────────────┴─────────────┘\n")
+        sb.WriteString("└────────────────────────┴──────────────────────────────┴────────────┴────────────────┴─────────────────────────────────────┴───────────────────┴────────────┴──────────┴──────────────┴─────────────┘\n")
     }
 
     return sb.String()
@@ -844,7 +857,9 @@ func main() {
         client.Transport = transport
     }
 
-    searchURL := fmt.Sprintf("https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=%s", search)
+    encodedSearch := strings.ReplaceAll(search, " ", "+")
+    searchURL := fmt.Sprintf("https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=%s", encodedSearch)
+
     resp, err := client.Get(searchURL)
     if err != nil {
         if useColors {
@@ -853,16 +868,28 @@ func main() {
             log.Fatalf("[!] Error querying the search API: %v", err)
         }
     }
-    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        body, _ := io.ReadAll(resp.Body)
+        resp.Body.Close()
+        if useColors {
+            log.Fatalf("[%s!%s] API returned non-200 status: %s\nResponse: %s", Red, Reset, resp.Status, string(body))
+        } else {
+            log.Fatalf("[!] API returned non-200 status: %s\nResponse: %s", resp.Status, string(body))
+        }
+    }
 
     var result NVDSearchResponse
     if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+        body, _ := io.ReadAll(resp.Body)
+        resp.Body.Close()
         if useColors {
-            log.Fatalf("[%s!%s] Error decoding search JSON: %v", Red, Reset, err)
+            log.Fatalf("[%s!%s] Error decoding search JSON: %v\nResponse: %s", Red, Reset, err, string(body))
         } else {
-            log.Fatalf("[!] Error decoding search JSON: %v", err)
+            log.Fatalf("[!] Error decoding search JSON: %v\nResponse: %s", err, string(body))
         }
     }
+    defer resp.Body.Close()
 
     var validVulns []VulnerabilityItem
     for _, v := range result.Vulnerabilities {
@@ -872,9 +899,7 @@ func main() {
                 for _, cpeMatch := range node.CpeMatch {
                     if cpeMatch.Vulnerable && strings.Contains(strings.ToLower(cpeMatch.Criteria), strings.ToLower(search)) {
                         if version != "" {
-                            if (cpeMatch.VersionEndExcluding != "" && compareVersions(version, cpeMatch.VersionEndExcluding) < 0) ||
-                                (cpeMatch.VersionEndIncluding != "" && compareVersions(version, cpeMatch.VersionEndIncluding) <= 0) ||
-                                (cpeMatch.VersionEndExcluding == "" && cpeMatch.VersionEndIncluding == "") {
+                            if cpeMatch.VersionEndIncluding == "" || compareVersions(version, cpeMatch.VersionEndIncluding) <= 0 {
                                 vulnerable = true
                                 break
                             }
@@ -895,8 +920,23 @@ func main() {
         if !vulnerable {
             for _, desc := range v.CVE.Descriptions {
                 if desc.Lang == "en" && strings.Contains(strings.ToLower(desc.Value), strings.ToLower(search)) {
-                    vulnerable = true
-                    break
+                    if version != "" {
+                        descLower := strings.ToLower(desc.Value)
+                        versionLower := strings.ToLower(version)
+                        if strings.Contains(descLower, versionLower) ||
+                            strings.Contains(descLower, "up to "+versionLower) ||
+                            strings.Contains(descLower, versionLower+" or earlier") ||
+                            strings.Contains(descLower, versionLower+" or before") ||
+                            strings.Contains(descLower, "before "+versionLower) ||
+                            strings.Contains(descLower, "hasta "+versionLower) ||
+                            strings.Contains(descLower, versionLower+" o anterior") {
+                            vulnerable = true
+                            break
+                        }
+                    } else {
+                        vulnerable = true
+                        break
+                    }
                 }
             }
         }
@@ -1083,30 +1123,30 @@ func main() {
         "CWE-189":  {"en": "Numeric Errors", "es": "Errores numéricos"},
         "CWE-320":  {"en": "Key Management Errors", "es": "Errores en gestión de claves"},
         "CWE-388":  {"en": "Error Handling", "es": "Manejo de errores"},
-	"CWE-80":   {"en": "Basic XSS", "es": "XSS Básico"},
-	"CWE-90":   {"en": "LDAP Injection", "es": "Inyección LDAP"},
-	"CWE-120":  {"en": "Buffer Copy No Check", "es": "Copia Búfer Sin Verif."},
-	"CWE-122":  {"en": "Heap Buffer Overflow", "es": "Desb. Búfer Montón"},
-	"CWE-126":  {"en": "Buffer Over-read", "es": "Sobrelectura Búfer"},
-	"CWE-201":  {"en": "Sensitive Info Leak", "es": "Fuga Info Sensible"},
-	"CWE-415":  {"en": "Double Free", "es": "Liberación Doble"},
-	"CWE-417":  {"en": "Uninit. Variable Use", "es": "Uso Var. No Inicial."},
-	"CWE-664":  {"en": "Resource Lifecycle Err", "es": "Error Ciclo Recurso"},
-	"CWE-703":  {"en": "Exception Handling Err", "es": "Error Manejo Excep."},
-	"CWE-1004": {"en": "Cookie No HttpOnly", "es": "Cookie Sin HttpOnly"},
-	"CWE-843":  {"en": "Type Confusion", "es": "Confusión de Tipo"},
-	"CWE-824":  {"en": "Uninit. Pointer Access", "es": "Acceso Puntero No Init."},
-	"CWE-770":  {"en": "Resource Alloc. No Limit", "es": "Asign. Recurso Sin Límite"},
-	"CWE-670":  {"en": "Incorrect Control Flow", "es": "Flujo Control Erróneo"},
-	"CWE-294":  {"en": "Auth Bypass Replay", "es": "Bypass Autent. por Replay"},
-	"CWE-290":  {"en": "Auth Bypass Spoofing", "es": "Bypass Autent. por Spoofing"},
-	"CWE-639":  {"en": "Auth Bypass User Key", "es": "Bypass Aut. por Clave User"},
-	"CWE-369":  {"en": "Divide By Zero", "es": "División por Cero"},
-	"CWE-312":  {"en": "Cleartext Sens. Info", "es": "Info Sens. en Claro"},
-	"CWE-319":  {"en": "Cleartext Sens. Trans.", "es": "Trans. Sens. en Claro"},
-	"CWE-425":  {"en": "Forced Browsing", "es": "Navegación Forzada"},
-	"CWE-494":  {"en": "No Integrity Code DL", "es": "Descarga Código Sin Integr."},
-	"CWE-834":  {"en": "Excessive Iteration", "es": "Iteración Excesiva"},
+        "CWE-80":   {"en": "Basic XSS", "es": "XSS Básico"},
+        "CWE-90":   {"en": "LDAP Injection", "es": "Inyección LDAP"},
+        "CWE-120":  {"en": "Buffer Copy No Check", "es": "Copia Búfer Sin Verif."},
+        "CWE-122":  {"en": "Heap Buffer Overflow", "es": "Desb. Búfer Montón"},
+        "CWE-126":  {"en": "Buffer Over-read", "es": "Sobrelectura Búfer"},
+        "CWE-201":  {"en": "Sensitive Info Leak", "es": "Fuga Info Sensible"},
+        "CWE-415":  {"en": "Double Free", "es": "Liberación Doble"},
+        "CWE-417":  {"en": "Uninit. Variable Use", "es": "Uso Var. No Inicial."},
+        "CWE-664":  {"en": "Resource Lifecycle Err", "es": "Error Ciclo Recurso"},
+        "CWE-703":  {"en": "Exception Handling Err", "es": "Error Manejo Excep."},
+        "CWE-1004": {"en": "Cookie No HttpOnly", "es": "Cookie Sin HttpOnly"},
+        "CWE-843":  {"en": "Type Confusion", "es": "Confusión de Tipo"},
+        "CWE-824":  {"en": "Uninit. Pointer Access", "es": "Acceso Puntero No Init."},
+        "CWE-770":  {"en": "Resource Alloc. No Limit", "es": "Asign. Recurso Sin Límite"},
+        "CWE-670":  {"en": "Incorrect Control Flow", "es": "Flujo Control Erróneo"},
+        "CWE-294":  {"en": "Auth Bypass Replay", "es": "Bypass Autent. por Replay"},
+        "CWE-290":  {"en": "Auth Bypass Spoofing", "es": "Bypass Autent. por Spoofing"},
+        "CWE-639":  {"en": "Auth Bypass User Key", "es": "Bypass Aut. por Clave User"},
+        "CWE-369":  {"en": "Divide By Zero", "es": "División por Cero"},
+        "CWE-312":  {"en": "Cleartext Sens. Info", "es": "Info Sens. en Claro"},
+        "CWE-319":  {"en": "Cleartext Sens. Trans.", "es": "Trans. Sens. en Claro"},
+        "CWE-425":  {"en": "Forced Browsing", "es": "Navegación Forzada"},
+        "CWE-494":  {"en": "No Integrity Code DL", "es": "Descarga Código Sin Integr."},
+        "CWE-834":  {"en": "Excessive Iteration", "es": "Iteración Excesiva"},
     }
 
     var displayVulns []vulnDisplay
