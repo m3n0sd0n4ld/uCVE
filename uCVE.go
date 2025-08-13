@@ -5,9 +5,9 @@ import (
     "encoding/json"
     "flag"
     "fmt"
-    "log"
     "html/template"
     "io"
+    "log"
     "net/http"
     "net/url"
     "os"
@@ -16,6 +16,7 @@ import (
     "strings"
     "time"
     "unicode/utf8"
+    "github.com/hashicorp/go-version"
 )
 
 const (
@@ -37,7 +38,7 @@ const bannerColored = `
   ____  ___  ____/_ |  / /__  ____/
   _  / / /  /    __ | / /__  __/   
   / /_/ // /___  __ |/ / _  /___   
-  \__,_/ \____/  _____/  /_____/ ` + Red + `v.3.0` + Reset + `
+  \__,_/ \____/  _____/  /_____/ ` + Red + `v.3.1` + Reset + `
 
           by` + Bold + Orange + ` M3n0sD0n4ld ` + Reset + `and` + Bold + Orange + ` Siriil ` + Reset + `
 `
@@ -99,11 +100,12 @@ type VulnerabilityItem struct {
         Configurations []struct {
             Nodes []struct {
                 CpeMatch []struct {
-                    Vulnerable          bool   `json:"vulnerable"`
-                    Criteria            string `json:"criteria"`
-                    VersionEndExcluding string `json:"versionEndExcluding,omitempty"`
-                    VersionEndIncluding string `json:"versionEndIncluding,omitempty"`
-                    MatchCriteriaId     string `json:"matchCriteriaId"`
+                    Vulnerable           bool   `json:"vulnerable"`
+                    Criteria             string `json:"criteria"`
+                    VersionStartIncluding string `json:"versionStartIncluding,omitempty"`
+                    VersionEndExcluding  string `json:"versionEndExcluding,omitempty"`
+                    VersionEndIncluding  string `json:"versionEndIncluding,omitempty"`
+                    MatchCriteriaId      string `json:"matchCriteriaId"`
                 } `json:"cpeMatch"`
             } `json:"nodes"`
         } `json:"configurations"`
@@ -141,14 +143,13 @@ type HTMLData struct {
 
 func showHelp() {
     fmt.Println()
-    fmt.Println(`Use: uCVE -s <product> -vp <version> [-lg <en|es>] [-r <risks>] [-e <vendors>] [-i <vendors>] [-o <filename.txt>] [-oHTML <filename.html>] [-oJSON <filename.json>] [-oCSV <filename.csv>] [-x <host:port>]
+    fmt.Println(`Use: uCVE -s <product> [-lg <en|es>] [-r <risks>] [-e <vendors>] [-i <vendors>] [-o <filename.txt>] [-oHTML <filename.html>] [-oJSON <filename.json>] [-oCSV <filename.csv>] [-x <host:port>]
 
 Parameters:
-  -s          Product to search for (example: crushftp, jquery)
-  -vp         Product version (required, example: 10.8.4)
+  -s          Product to search for, optionally including version (example: crushftp, 'jquery 3.5.1')
   -lg         Language (en or es), optional, default "en"
   -r          Risk levels to filter (comma-separated, example: critical,high)
-  -e          Vendors to exclude (comma-separated, example: Dennis Bruecke,Jqueryui)
+  -e          Vendors to exclude (comma-separated, example: jquery,jqueryui)
   -i          Vendors to include (comma-separated, example: jquery,jqueryui)
   -o          Name of the text file to save the console output (optional)
   -oHTML      Output HTML file name (optional)
@@ -161,30 +162,19 @@ Parameters:
 func compareVersions(v1, v2 string) int {
     v1 = strings.TrimPrefix(v1, "v")
     v2 = strings.TrimPrefix(v2, "v")
-    v1Parts := strings.Split(v1, ".")
-    v2Parts := strings.Split(v2, ".")
-    maxLen := len(v1Parts)
-    if len(v2Parts) < maxLen {
-        maxLen = len(v2Parts)
+    ver1, err1 := version.NewVersion(v1)
+    ver2, err2 := version.NewVersion(v2)
+    if err1 != nil || err2 != nil {
+        return strings.Compare(v1, v2)
     }
-    for i := 0; i < maxLen; i++ {
-        n1, err1 := strconv.Atoi(strings.TrimSpace(v1Parts[i]))
-        n2, err2 := strconv.Atoi(strings.TrimSpace(v2Parts[i]))
-        if err1 != nil || err2 != nil {
-            return strings.Compare(v1Parts[i], v2Parts[i])
-        }
-        if n1 < n2 {
-            return -1
-        } else if n1 > n2 {
-            return 1
-        }
-    }
-    if len(v1Parts) < len(v2Parts) {
+    switch {
+    case ver1.LessThan(ver2):
         return -1
-    } else if len(v1Parts) > len(v2Parts) {
+    case ver1.GreaterThan(ver2):
         return 1
+    default:
+        return 0
     }
-    return 0
 }
 
 func normalizeName(name string) string {
@@ -213,10 +203,13 @@ func extractCPEInfo(cpe string) (vendor, product string) {
     return
 }
 
-func formatDate(d string) string {
+func formatDate(d, lang string) string {
     t, err := time.Parse("2006-01-02", d)
     if err != nil {
         return d
+    }
+    if lang == "en" {
+        return t.Format("01/02/2006")
     }
     return t.Format("02/01/2006")
 }
@@ -265,7 +258,7 @@ func generateHTMLTable(filename, product, version, lang string, data []vulnDispl
 </head>
 <body>
     <h1>{{if eq .Lang "es"}}Informe de Vulnerabilidades{{else}}Vulnerability Report{{end}}</h1>
-    <p class="info">{{if eq .Lang "es"}}Resultados para el producto <strong>{{.Title}}</strong> (versión: {{.Version}}) - Generado el {{.GeneratedDate}}{{else}}Results for product <strong>{{.Title}}</strong> (version: {{.Version}}) - Generated on {{.GeneratedDate}}{{end}}</p>
+    <p class="info">{{if eq .Lang "es"}}Resultados para el producto <strong>{{.Title}}</strong>{{if .Version}} (versión: {{.Version}}){{end}} - Generado el {{.GeneratedDate}}{{else}}Results for product <strong>{{.Title}}</strong>{{if .Version}} (version: {{.Version}}){{end}} - Generated on {{.GeneratedDate}}{{end}}</p>
     
     <table id="vulnerability-table">
         <thead>
@@ -538,7 +531,7 @@ func generateCSV(filename, lang string, data []vulnDisplay) {
     }
 }
 
-func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string) string {
+func printConsoleTable(displayVulns []vulnDisplay, lang, search string) string {
     var sb strings.Builder
 
     riskColorMap := map[string]string{
@@ -554,9 +547,9 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
     }
 
     if useColors {
-        sb.WriteString(fmt.Sprintf("[%s+%s] %d resultados para %s, versión: %s\n", Green, Reset, len(displayVulns), search, version))
+        sb.WriteString(fmt.Sprintf("[%s+%s] %d results for %s\n", Green, Reset, len(displayVulns), search))
     } else {
-        sb.WriteString(fmt.Sprintf("[+] %d resultados para %s, versión: %s\n", len(displayVulns), search, version))
+        sb.WriteString(fmt.Sprintf("[+] %d results for %s\n", len(displayVulns), search))
     }
 
     if lang == "es" {
@@ -598,7 +591,7 @@ func printConsoleTable(displayVulns []vulnDisplay, lang, search, version string)
                 "Vendor", "Product", "Version", "CVE", "Vulnerability",
                 "Published Date", "Score", "Risk", "Access", "Complexity"))
         }
-        sb.WriteString("├────────────────────────┼──────────────────────────────┼────────────┼────────────────┼─────────────────────────────────────┼───────────────────┼────────────┼──────────┼──────────────┼─────────────┤\n")
+        sb.WriteString("├────────────────────────┼──────────────────────────────┼────────────┴────────────────┴─────────────────────────────────────┴───────────────────┴────────────┴──────────┴──────────────┴─────────────┘\n")
     }
 
     for i, dv := range displayVulns {
@@ -675,8 +668,7 @@ func main() {
     }
     fmt.Println()
 
-    searchFlag := flag.String("s", "", "Product to search for")
-    versionFlag := flag.String("vp", "", "Product version (required)")
+    searchFlag := flag.String("s", "", "Product to search for, optionally including version")
     langFlag := flag.String("lg", "en", "Language (en|es)")
     riskFlag := flag.String("r", "", "Risk levels to filter (comma-separated, example: critical,high)")
     excludeVendorsFlag := flag.String("e", "", "Vendors to exclude (comma-separated, example: Dennis Bruecke,Jqueryui)")
@@ -691,7 +683,6 @@ func main() {
     flag.Parse()
 
     search := *searchFlag
-    version := *versionFlag
     lang := *langFlag
     risk := *riskFlag
     excludeVendors := *excludeVendorsFlag
@@ -704,16 +695,6 @@ func main() {
     proxy := *proxyFlag
 
     if help || search == "" {
-        showHelp()
-        return
-    }
-
-    if version == "" {
-        if useColors {
-            fmt.Printf("[%s!%s] Version parameter (-vp) is required\n", Red, Reset)
-        } else {
-            fmt.Println("[!] Version parameter (-vp) is required")
-        }
         showHelp()
         return
     }
@@ -745,6 +726,17 @@ func main() {
                 fmt.Println("[!] The proxy port must be a valid number.")
             }
             return
+        }
+    }
+
+    searchParts := strings.Fields(search)
+    product := search
+    version := ""
+    if len(searchParts) > 1 {
+        maybeVersion := searchParts[len(searchParts)-1]
+        if strings.ContainsAny(maybeVersion, "0123456789.") {
+            version = maybeVersion
+            product = strings.Join(searchParts[:len(searchParts)-1], " ")
         }
     }
 
@@ -857,7 +849,7 @@ func main() {
         client.Transport = transport
     }
 
-    encodedSearch := strings.ReplaceAll(search, " ", "+")
+    encodedSearch := strings.ReplaceAll(product, " ", "+")
     searchURL := fmt.Sprintf("https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=%s", encodedSearch)
 
     resp, err := client.Get(searchURL)
@@ -897,15 +889,48 @@ func main() {
         for _, config := range v.CVE.Configurations {
             for _, node := range config.Nodes {
                 for _, cpeMatch := range node.CpeMatch {
-                    if cpeMatch.Vulnerable && strings.Contains(strings.ToLower(cpeMatch.Criteria), strings.ToLower(search)) {
-                        if version != "" {
-                            if cpeMatch.VersionEndIncluding == "" || compareVersions(version, cpeMatch.VersionEndIncluding) <= 0 {
+                    if cpeMatch.Vulnerable {
+                        _, cpeProduct := extractCPEInfo(cpeMatch.Criteria)
+                        if strings.Contains(strings.ToLower(cpeProduct), strings.ToLower(product)) {
+                            if version != "" {
+                                versionInRange := true
+                                cpeParts := strings.Split(cpeMatch.Criteria, ":")
+                                cpeVersion := ""
+                                if len(cpeParts) >= 6 {
+                                    cpeVersion = cpeParts[5]
+                                }
+                                if cpeVersion != "" && cpeMatch.VersionStartIncluding == "" && cpeMatch.VersionEndExcluding == "" && cpeMatch.VersionEndIncluding == "" {
+                                    cmpVersion := compareVersions(version, cpeVersion)
+                                    if cmpVersion != 0 {
+                                        versionInRange = false
+                                    }
+                                } else {
+                                    if cpeMatch.VersionStartIncluding != "" {
+                                        cmpStart := compareVersions(version, cpeMatch.VersionStartIncluding)
+                                        if cmpStart < 0 {
+                                            versionInRange = false
+                                        }
+                                    }
+                                    if cpeMatch.VersionEndExcluding != "" {
+                                        cmpEndExcl := compareVersions(version, cpeMatch.VersionEndExcluding)
+                                        if cmpEndExcl >= 0 {
+                                            versionInRange = false
+                                        }
+                                    } else if cpeMatch.VersionEndIncluding != "" {
+                                        cmpEndIncl := compareVersions(version, cpeMatch.VersionEndIncluding)
+                                        if cmpEndIncl > 0 {
+                                            versionInRange = false
+                                        }
+                                    }
+                                }
+                                if versionInRange {
+                                    vulnerable = true
+                                    break
+                                }
+                            } else {
                                 vulnerable = true
                                 break
                             }
-                        } else {
-                            vulnerable = true
-                            break
                         }
                     }
                 }
@@ -919,17 +944,25 @@ func main() {
         }
         if !vulnerable {
             for _, desc := range v.CVE.Descriptions {
-                if desc.Lang == "en" && strings.Contains(strings.ToLower(desc.Value), strings.ToLower(search)) {
+                if desc.Lang == "en" && strings.Contains(strings.ToLower(desc.Value), strings.ToLower(product)) {
                     if version != "" {
                         descLower := strings.ToLower(desc.Value)
                         versionLower := strings.ToLower(version)
-                        if strings.Contains(descLower, versionLower) ||
-                            strings.Contains(descLower, "up to "+versionLower) ||
+                        if strings.Contains(descLower, "fixed in "+versionLower) ||
+                            strings.Contains(descLower, versionLower+" or later") ||
+                            strings.Contains(descLower, "arreglado en "+versionLower) ||
+                            strings.Contains(descLower, versionLower+" o posterior") ||
+                            strings.Contains(descLower, "from "+versionLower+" before") ||
+                            strings.Contains(descLower, "antes de "+versionLower) ||
+                            strings.Contains(descLower, "before "+versionLower) {
+                            continue
+                        }
+                        if strings.Contains(descLower, "up to "+versionLower) ||
                             strings.Contains(descLower, versionLower+" or earlier") ||
                             strings.Contains(descLower, versionLower+" or before") ||
-                            strings.Contains(descLower, "before "+versionLower) ||
                             strings.Contains(descLower, "hasta "+versionLower) ||
-                            strings.Contains(descLower, versionLower+" o anterior") {
+                            strings.Contains(descLower, versionLower+" o anterior") ||
+                            (strings.Contains(descLower, versionLower) && !strings.Contains(descLower, "from") && !strings.Contains(descLower, "antes de") && !strings.Contains(descLower, "before")) {
                             vulnerable = true
                             break
                         }
@@ -946,7 +979,7 @@ func main() {
     }
 
     if len(validVulns) == 0 {
-        msg := "[!] No vulnerabilities were found for the product " + search
+        msg := "[!] No vulnerabilities were found for the product " + product
         if version != "" {
             msg += " and version " + version
         }
@@ -1152,17 +1185,17 @@ func main() {
     var displayVulns []vulnDisplay
     for _, v := range validVulns {
         vendorRaw := "unknown"
-        productRaw := search
+        productRaw := product
         vendor := "Unknown"
-        product := normalizeName(search)
+        productName := normalizeName(product)
 
         for _, config := range v.CVE.Configurations {
             for _, node := range config.Nodes {
                 for _, cpeMatch := range node.CpeMatch {
-                    if cpeMatch.Vulnerable && strings.Contains(strings.ToLower(cpeMatch.Criteria), strings.ToLower(search)) {
+                    if cpeMatch.Vulnerable && strings.Contains(strings.ToLower(cpeMatch.Criteria), strings.ToLower(product)) {
                         vendorRaw, productRaw = extractCPEInfo(cpeMatch.Criteria)
                         vendor = normalizeName(vendorRaw)
-                        product = normalizeName(productRaw)
+                        productName = normalizeName(productRaw)
                         break
                     }
                 }
@@ -1177,8 +1210,8 @@ func main() {
 
         if vendorRaw == "unknown" {
             for _, desc := range v.CVE.Descriptions {
-                if desc.Lang == "en" && strings.Contains(strings.ToLower(desc.Value), strings.ToLower(search)) {
-                    vendorRaw = strings.ToLower(search)
+                if desc.Lang == "en" && strings.Contains(strings.ToLower(desc.Value), strings.ToLower(product)) {
+                    vendorRaw = strings.ToLower(product)
                     vendor = normalizeName(vendorRaw)
                     break
                 }
@@ -1218,7 +1251,7 @@ func main() {
         if len(v.CVE.Published) >= 10 {
             pubDate = v.CVE.Published[:10]
         }
-        fmtDate := formatDate(pubDate)
+        fmtDate := formatDate(pubDate, lang)
 
         cweCode := ""
         found := false
@@ -1326,7 +1359,7 @@ func main() {
             VendorRaw:          vendorRaw,
             ProductRaw:         productRaw,
             Vendor:             vendor,
-            Product:            product,
+            Product:            productName,
             Version:            version,
             CVE:                cve,
             VulnerabilityTitle: title,
@@ -1340,7 +1373,7 @@ func main() {
     }
 
     if len(displayVulns) == 0 {
-        msg := "[!] No vulnerabilities were found for the product " + search
+        msg := "[!] No vulnerabilities were found for the product " + product
         if version != "" {
             msg += " and version " + version
         }
@@ -1361,7 +1394,7 @@ func main() {
         return
     }
 
-    tableOutput := printConsoleTable(displayVulns, lang, search, version)
+    tableOutput := printConsoleTable(displayVulns, lang, search)
     fmt.Print(tableOutput)
 
     if consoleFile != "" {
@@ -1376,45 +1409,23 @@ func main() {
         }
         defer f.Close()
 
-        if runtime.GOOS == "windows" {
-            _, err = f.Write([]byte{0xEF, 0xBB, 0xBF}) 
-            if err != nil {
-                if useColors {
-                    log.Printf("[%s!%s] Error writing UTF-8 BOM to '%s': %v", Red, Reset, consoleFile, err)
-                } else {
-                    log.Printf("[!] Error writing UTF-8 BOM to '%s': %v", consoleFile, err)
-                }
-                return
-            }
-        }
-
-        banner := bannerPlain
-        if useColors {
-            banner = bannerColored
-        }
-        content := banner + "\n\n" + tableOutput
-        if runtime.GOOS == "windows" {
-            content = strings.ReplaceAll(content, "\n", "\r\n")
-        }
-        _, err = f.WriteString(content)
-        if err != nil {
+        if _, err := f.WriteString(tableOutput); err != nil {
             if useColors {
-                log.Printf("[%s!%s] Error writing output to '%s': %v", Red, Reset, consoleFile, err)
+                log.Printf("[%s!%s] Error writing to '%s': %v", Red, Reset, consoleFile, err)
             } else {
-                log.Printf("[!] Error writing output to '%s': %v", consoleFile, err)
+                log.Printf("[!] Error writing to '%s': %v", consoleFile, err)
             }
             return
         }
-
         if useColors {
-            fmt.Printf("[%s+%s] Console output saved in '%s'\n", Green, Reset, consoleFile)
+            fmt.Printf("[%s+%s] Console output saved to '%s'\n", Green, Reset, consoleFile)
         } else {
-            fmt.Printf("[+] Console output saved in '%s'\n", consoleFile)
+            fmt.Printf("[+] Console output saved to '%s'\n", consoleFile)
         }
     }
 
     if htmlFile != "" {
-        generateHTMLTable(htmlFile, search, version, lang, displayVulns)
+        generateHTMLTable(htmlFile, product, version, lang, displayVulns)
     }
 
     if jsonFile != "" {
